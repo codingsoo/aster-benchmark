@@ -277,6 +277,7 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.
           <configuration>
             <excludes>
               <!-- files used during tests -->
+              <exclude>collect_code_coverage.py</exclude>
               <exclude>src/test/resources/**</exclude>
               <exclude>.pmd</exclude>
               <exclude>.projectile</exclude>
@@ -317,6 +318,60 @@ Brotli, Zstandard and ar, cpio, jar, tar, zip, dump, 7z, arj.
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.pitest</groupId>
+        <artifactId>pitest-maven</artifactId>
+        <version>1.16.1</version>
+        <dependencies>
+          <!-- JUnit 5 support -->
+          <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.1</version> <!-- Check for the latest version -->
+          </dependency>
+        </dependencies>
+        <configuration>
+          <jvmArgs>
+            <jvmArg>-Xmx1024m</jvmArg> <!-- Increase heap size as necessary -->
+            <jvmArg>-XX:MaxPermSize=256m</jvmArg> <!-- Adjust according to your JDK version -->
+          </jvmArgs>
+          <targetClasses>
+            <param>org.apache.commons.compress.*</param>
+          </targetClasses>
+          <targetTests>
+            <param>org.apache.commons.compress.*Test</param>
+          </targetTests>
+          <mutators>
+            <mutator>DEFAULTS</mutator> <!-- Change to ALL, STRONGER, DEFAULTS as needed -->
+          </mutators>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>mutationCoverage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <!-- create the source and binary assemblies -->
         <artifactId>maven-assembly-plugin</artifactId>
